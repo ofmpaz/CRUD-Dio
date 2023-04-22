@@ -1,0 +1,55 @@
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LivroDAO {
+    private Connection conexao;
+
+    public LivroDAO() {
+        conexao = null;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conexao = DriverManager.getConnection("jdbc:mysql://localhost/livros", "root", "");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Driver não encontrado");
+        } catch (SQLException e) {
+            System.out.println("Erro ao conectar ao banco de dados");
+        }
+    }
+
+    public boolean adicionar(Livro livro) {
+        String sql = "INSERT INTO livros (titulo, autor, ano_publicacao) VALUES (?, ?, ?)";
+        try {
+            PreparedStatement stmt = conexao.prepareStatement(sql);
+            stmt.setString(1, livro.getTitulo());
+            stmt.setString(2, livro.getAutor());
+            stmt.setInt(3, livro.getAnoPublicacao());
+            stmt.execute();
+            stmt.close();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Erro ao adicionar o livro: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean atualizar(Livro livro) {
+        String sql = "UPDATE livros SET titulo = ?, autor = ?, ano_publicacao = ? WHERE id = ?";
+        try {
+            PreparedStatement stmt = conexao.prepareStatement(sql);
+            stmt.setString(1, livro.getTitulo());
+            stmt.setString(2, livro.getAutor());
+            stmt.setInt(3, livro.getAnoPublicacao());
+            stmt.setInt(4, livro.getId());
+            stmt.execute();
+            stmt.close();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar o livro: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean remover(int id) {
+        String sql = "DELETE FROM livros WHERE id = ?";
+        try {
